@@ -3,8 +3,8 @@ import pandas as pd
 
 
 class Projectile:
-    def __init__(self, dt: float, A: float, B: float, m: float, xi: float,
-                 yi: float, vi: float, angle: float, g: float) -> None:
+    def __init__(self, dt: float, A: float, B: float, m: float, xi: float, yi: float, vi: float, angle: float,
+                 g: float) -> None:
         #yapf: disable
         self.dt         : float = dt
         self.A          : float = A
@@ -31,13 +31,13 @@ class Projectile:
             return v_x
 
         def fa(t, x, v_x):
-            return (-self.A * self.v * v_x)
+            return (-self.A * self.v * v_x - self.B * v_x) / self.m
 
         def gv(t, x, v_y):
             return v_y
 
         def ga(t, x, v_y):
-            return (-self.g - self.A * self.v * v_y)
+            return (-self.g - self.A * self.v * v_y - self.B * v_y) / self.m
 
         v_x = self.vi * np.cos(np.radians(self.angle))
         v_y = self.vi * np.sin(np.radians(self.angle))
@@ -70,9 +70,7 @@ class Projectile:
                 self.isSolved = True
                 break
 
-        self.result = pd.DataFrame.from_dict(self.result_dict,
-                                             orient='index',
-                                             columns=['x', 'y'])
+        self.result = pd.DataFrame.from_dict(self.result_dict, orient='index', columns=['x', 'y'])
 
     def getResults(self, Slice: slice) -> tuple:
         x = self.result.loc[Slice][['x']].to_numpy()
@@ -88,13 +86,7 @@ class Projectile:
     def getMaxTime(self) -> float:
         return self.result.index[-1]
 
-    def RKG_Generator(self,
-                      F: list,
-                      xi: float,
-                      yi: list,
-                      h: float,
-                      Bt: dict,
-                      PrcF: int = 6) -> tuple:
+    def RKG_Generator(self, F: list, xi: float, yi: list, h: float, Bt: dict, PrcF: int = 6) -> tuple:
         yn = yi
         xn = xi
         var = len(yn)
@@ -121,7 +113,7 @@ class Projectile:
             yield (xn, *yn)
 
     def Butcher_Tableau(self, method=None):
-    #yapf: disable
+        #yapf: disable
         if method == None:
             Meth_list = ['Forward Euler',
                         'Explicit Midpoint',

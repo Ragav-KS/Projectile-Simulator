@@ -12,7 +12,7 @@ from ui import Ui
 
 #yapf: disable
 t           : float     = 0
-dt          : float     = 0.025
+dt          : float     = 0.005
 A           : float     = 4e-5
 B           : float     = 0
 
@@ -60,8 +60,7 @@ def LoadData():
     Projectiles = {}
 
     for id, Prjctl in Prjtls.items():
-        projectile = Projectile(dt, A, B, Prjctl['m'], Prjctl['x_i'],
-                                Prjctl['y_i'], Prjctl['v'], Prjctl['ang'], g)
+        projectile = Projectile(dt, A, B, Prjctl['m'], Prjctl['x_i'], Prjctl['y_i'], Prjctl['v'], Prjctl['ang'], g)
         Projectiles[id] = projectile
 
 
@@ -70,6 +69,7 @@ def ProcessData():
 
     max_xrange = [0, 1]
     max_yrange = [0, 1]
+    max_time = 0.0
 
     for Prjctl in Projectiles.values():
         Prjctl: Projectile
@@ -88,6 +88,7 @@ def ProcessData():
         max_yrange[0] = min(yr[0], max_yrange[0])
         max_yrange[1] = max(yr[1], max_yrange[1])
 
+    MyUI.SetMaxTime(max_t=max_time)
     set_range()
 
 
@@ -151,7 +152,6 @@ def cache_bg():
 def RedrawPlots():
     global lineList, ax, max_xrange, max_yrange, t
 
-    timer.stop()
     t = 0
 
     LoadData()
@@ -184,24 +184,18 @@ def RefreshPlots(animated: bool = False):
 
 
 def startAnimation():
-    timer.start()
-
     RefreshPlots(animated=True)
     cache_bg()
 
 
 def stopAnimation():
-    timer.stop()
     RefreshPlots()
 
 
-def animate():
+def animate(t_new: float):
     global dt, t
 
-    t = round(t + dt, 6)
-
-    if t > max_time:
-        stopAnimation()
+    t = t_new
 
     update_points(blit=True)
 
@@ -211,20 +205,14 @@ if __name__ == '__main__':
 
     MyUI = Ui()
 
-    MyUI.txt_dt.setValue(dt)
-    MyUI.txt_A.setValue(A)
-    MyUI.txt_B.setValue(B)
+    MyUI.Redraw.connect(RedrawPlots)
+    MyUI.blit_start.connect(startAnimation)
+    MyUI.blit_stop.connect(stopAnimation)
+    MyUI.update.connect(animate)
 
-    MyUI.button_Redraw.clicked.connect(RedrawPlots)
-    MyUI.button_Run.clicked.connect(startAnimation)
-    MyUI.button_Pause.clicked.connect(stopAnimation)
-
-    timer = QtCore.QTimer()
-    timer.setInterval(50)
-    timer.timeout.connect(animate)
+    MyUI.showMaximized()
 
     PrepareFigure()
     RedrawPlots()
 
-    MyUI.showMaximized()
     app.exec_()
