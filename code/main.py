@@ -150,7 +150,7 @@ def cache_bg():
 
 
 def RedrawPlots():
-    global lineList, ax, max_xrange, max_yrange, t
+    global lineList, ax, max_xrange, max_yrange, t, fig
 
     t = 0
 
@@ -200,19 +200,29 @@ def animate(t_new: float):
     update_points(blit=True)
 
 
+def windowResize():
+    global fig
+
+    fig.tight_layout()
+
+
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
 
     MyUI = Ui()
 
+    PrepareFigure()
+
     MyUI.Redraw.connect(RedrawPlots)
     MyUI.blit_start.connect(startAnimation)
     MyUI.blit_stop.connect(stopAnimation)
-    MyUI.update.connect(animate)
+    MyUI.update_plot.connect(animate)
+    MyUI.resizeSignal.connect(windowResize)
 
-    MyUI.showMaximized()
+    # MyUI.showMaximized()
+    MyUI.show()
 
-    PrepareFigure()
+    windowResize()
     RedrawPlots()
 
     app.exec_()

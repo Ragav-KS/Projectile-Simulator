@@ -4,7 +4,7 @@ import matplotlib as mpl
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NaviBar
 from matplotlib.figure import Figure
-from PyQt5 import QtCore, QtWidgets, uic
+from PyQt5 import QtCore, QtWidgets, uic, QtGui
 
 mpl.use('Qt5Agg')
 
@@ -17,13 +17,15 @@ class MplCanvas(FigCanvas):
 
 class Ui(QtWidgets.QMainWindow):
 
+    resizeSignal = QtCore.pyqtSignal()
+
     Pause = QtCore.pyqtSignal()
     Run = QtCore.pyqtSignal()
     Redraw = QtCore.pyqtSignal()
 
     blit_start = QtCore.pyqtSignal()
     blit_stop = QtCore.pyqtSignal()
-    update = QtCore.pyqtSignal(float)
+    update_plot = QtCore.pyqtSignal(float)
 
     def __init__(self):
         super(Ui, self).__init__()
@@ -85,7 +87,7 @@ class Ui(QtWidgets.QMainWindow):
 
     def Handler_Slider_Seek_Press(self):
         self.blit_start.emit()
-        self.update.emit(self.t)
+        self.update_plot.emit(self.t)
         pass
 
     def Handler_Slider_Seek_Released(self):
@@ -96,7 +98,7 @@ class Ui(QtWidgets.QMainWindow):
         self.t = val * 1e-6
         self.lbl_Time.setText(
             '<html><head/><body><p><span style=" font-size:10pt;">{:.2f} s</span></p></body></html>'.format(self.t, 2))
-        self.update.emit(self.t)
+        self.update_plot.emit(self.t)
 
     def Handler_Slider_Speed_Moved(self, val: int):
         self.speed = 10**(val / 100)
@@ -141,6 +143,10 @@ class Ui(QtWidgets.QMainWindow):
         self.t = 0
         self.slider_Seek.setValue(round(self.t * 1e6))
         self.Redraw.emit()
+
+    def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
+        self.resizeSignal.emit()
+        return super(Ui, self).resizeEvent(a0)
 
     def SetMaxTime(self, max_t: float):
         self.max_t: float = max_t

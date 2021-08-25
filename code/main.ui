@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>990</width>
-    <height>608</height>
+    <width>1366</width>
+    <height>768</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>990</width>
+     <width>1366</width>
      <height>26</height>
     </rect>
    </property>
@@ -114,7 +114,7 @@
            <number>5</number>
           </property>
           <property name="minimum">
-           <double>0.000000000000000</double>
+           <double>0.000010000000000</double>
           </property>
           <property name="singleStep">
            <double>0.000500000000000</double>
@@ -181,7 +181,7 @@
           <x>0</x>
           <y>0</y>
           <width>218</width>
-          <height>257</height>
+          <height>417</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
